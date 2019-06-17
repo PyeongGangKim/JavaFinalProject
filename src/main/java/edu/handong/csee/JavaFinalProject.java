@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.cli.*;
-public class JavaFinalProject {
+public class JavaFinalProject extends Thread {
+	private int selectNumber=0;
 	private String dataPath;
 	private String resultPath;
 	private boolean help;
+	private String[] args;
 	private LinkedList<ArrayList<String>> summaryList;
 	private LinkedList<ArrayList<String>> imageList;
 	ArrayList<ArrayList<String>> SumaarydataCollect;
@@ -16,11 +18,13 @@ public class JavaFinalProject {
 	HashMap<String,InputStream> summary;
 	HashMap<String,InputStream> image;
 	public static void main(String[] args) {
-		JavaFinalProject projector = new JavaFinalProject();
-		projector.run(args);
+		JavaFinalProject projector1 = new JavaFinalProject(1,args);
+		JavaFinalProject projector2 = new JavaFinalProject(2,args);
+		projector1.start();
+		projector2.start();
 	}
 
-	public void run(String[] args) {
+	public void run() {
 	 Options options = new Options();
 	 createOptions(options);
 	 if(parseOptions(options, args)) {
@@ -28,23 +32,25 @@ public class JavaFinalProject {
 				printHelp(options);
 				return;
 			}
+	
 	 ZipFileUtils zipFile=new ZipFileUtils();
 	 zipFile.readFileInZip(dataPath);
-	 summary=zipFile.getCollectTheInputStreamAboutSummary();
-	 image=zipFile.getCollectTheInputStreamAboutImage();
-	 summaryList=Utils.getSummaryData(summary);
-	 imageList=Utils.getImageData(image);
-	 SumaarydataCollect=summaryList.toArrayList();
-	 ImagedataCollect=imageList.toArrayList();
-	 
-	 
 	 int num1=resultPath.lastIndexOf(".");
 	 String extension=resultPath.substring(num1);
 	 String result= resultPath.substring(0,num1);
-	 String result1=result+1+extension;
+	 if(selectNumber==1) {
+	 summary=zipFile.getCollectTheInputStreamAboutSummary();
+	 summaryList=Utils.getSummaryData(summary);
+	 SumaarydataCollect=summaryList.toArrayList();
 	 String result2=result+2+extension;
-	 Utils.writeAFile(ImagedataCollect, result1);
 	 Utils.writeAFile(SumaarydataCollect, result2);
+	 }else {
+	 image=zipFile.getCollectTheInputStreamAboutImage();
+	 imageList=Utils.getImageData(image);
+	 ImagedataCollect=imageList.toArrayList();
+	 String result1=result+1+extension;
+	 Utils.writeAFile(ImagedataCollect, result1);
+	 }
 	 }
 }
  private void createOptions(Options options) {
@@ -70,6 +76,10 @@ public class JavaFinalProject {
 				//.required()
 				.build());
 	}
+ public JavaFinalProject(int num,String[] arg) {
+	 selectNumber=num;
+	 args=arg;
+ }
  private boolean parseOptions(Options options, String[] args) {
 		CommandLineParser parser = new DefaultParser();
 
