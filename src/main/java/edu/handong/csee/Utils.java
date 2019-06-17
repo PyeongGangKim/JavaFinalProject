@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.*;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -27,7 +28,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType.*;
 import org.apache.poi.ss.formula.FormulaType;
 
-public class Utils{
+public class Utils {
 	public static void writeAFile(ArrayList<ArrayList<String>> lines, String targetFileName) {
 		
 		String fPath=targetFileName.replace("/",File.separator);
@@ -58,17 +59,27 @@ public class Utils{
 		}
 	}
 
+
+	/*public void run() {
+		
+		
+	}*/
+
 	
-	public static LinkedList<ArrayList<String>> getData(HashMap<String,ArrayList<InputStream>> zipFiles)  {
-		Map<String, ArrayList<InputStream>> sortedFile = new TreeMap<String,ArrayList<InputStream>>(zipFiles); 
+	public static LinkedList<ArrayList<String>> getSummaryData(HashMap<String,InputStream> zipFiles)  {
+		int count=0;
+		Map<String, InputStream> sortedFile = new TreeMap<String,InputStream>(zipFiles); 
 		Iterator<String> iteratorKey = sortedFile.keySet().iterator();
+		ArrayList<String> checkHead= new ArrayList<String>();
 		LinkedList<ArrayList<String>> dataList = new LinkedList<ArrayList<String>>();
 		while(iteratorKey.hasNext()) {
+			int num=0;
 			String key = iteratorKey.next();
-			for(InputStream is:zipFiles.get(key)) {
-		try (InputStream inp = is) {
-		    if(inp!=null) {
-		    	Workbook wb = WorkbookFactory.create(inp);
+			String temp = null;
+			InputStream is=zipFiles.get(key);
+		try {
+		    if(is!=null) {
+		    	Workbook wb = WorkbookFactory.create(is);
 		    	Sheet sheet = wb.getSheetAt(0);
 		        int rows = sheet.getPhysicalNumberOfRows();
 		        for(int r=0;r<rows;r++) {//row를 하나씩
@@ -77,11 +88,11 @@ public class Utils{
 		        	Row row=sheet.getRow(r);
 		        	int cells=row.getPhysicalNumberOfCells();
 		        	for(int c=0;c<cells;c++) {//한 행씩 저장하기
-		        		Cell cell = row.getCell(c);
+		        		Cell cell = row.getCell(c,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 		        		String cellData= new String();
-		        		if(cell==null) {
-		        			continue;
-		        		}
+		        	if(cell==null) {
+		        		continue;
+		        	}
 		        		switch(cell.getCellType()) {
 		        		case FORMULA:
 		        			cellData = cell.getCellFormula();
@@ -92,22 +103,38 @@ public class Utils{
 		        		case STRING:
 		        			cellData = cell.getStringCellValue()+"";
 		        			break;
-		        		case BLANK:
-		        			cellData = " ";
+		        		/*case BLANK:
+		        			cellData =" ";
 		        			break;
-		        		case ERROR:
+		        		/*case ERROR:
 		        			cellData = " ";
-		        			break;
+		        			break;*/
 		        			default:
 		       
+		        		}
+		        		if(count==0&&num==0) {//첫번째꺼 헤더가져오기
+		        			checkHead.add(cellData);
 		        		}
 		        		if(cell!=null) {
 		        			data.add(cellData);
 		        		}
 		        		
 		        	}
-			        	dataList.addANodeToTail(data);
-		      }	
+		        	if(count!=0&&num==0) {//헤더가 동일한지 체크하기
+		        		data.set(0,temp);
+		        		for(int j=0;j<checkHead.size();j++) {
+		        			if(checkHead.get(j).equals(data.get(j))==false) {
+		        				//throw new WrongDataForm(key);
+		        			}
+		        		}
+		        		
+		        	}else {
+		        	dataList.addANodeToTail(data);
+		        	}	
+		        	num++;
+		        }
+		        temp=key;
+		        count++;
 		    }
 			 }catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -115,11 +142,114 @@ public class Utils{
 			 } catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			 }
-			}
+			 }/*catch (WrongDataForm e) {
+				 e.makeErrorFile();
+				 
+			 }*/
+			
 		}
 		return dataList;
 	}
-
-
+	public static LinkedList<ArrayList<String>> getImageData(HashMap<String,InputStream> zipFiles){
+		int count=0;//첫번째 문자 세기
+		Map<String, InputStream> sortedFile = new TreeMap<String,InputStream>(zipFiles); 
+		Iterator<String> iteratorKey = sortedFile.keySet().iterator();
+		ArrayList<String> checkFirstHeader= new ArrayList<String>();
+		ArrayList<String> checkSecondHeader= new ArrayList<String>();
+		LinkedList<ArrayList<String>> dataList = new LinkedList<ArrayList<String>>();
+		while(iteratorKey.hasNext()) {
+			int num=0;//헤더세기
+			String key = iteratorKey.next();
+			String temp = null;
+			InputStream is=zipFiles.get(key);
+		try {
+		    if(is!=null) {
+		    	Workbook wb = WorkbookFactory.create(is);
+		    	Sheet sheet = wb.getSheetAt(0);
+		        int rows = sheet.getPhysicalNumberOfRows();
+		        for(int r=0;r<rows;r++) {//row를 하나씩
+		        	
+		        	ArrayList<String> data= new ArrayList<String>();
+		        	data.add(key);
+		        	Row row=sheet.getRow(r);
+		        	int cells=row.getPhysicalNumberOfCells();
+		        	for(int c=0;c<cells;c++) {//한 행씩 저장하기
+		        		Cell cell = row.getCell(c,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+		        		String cellData= new String();
+		        		if(cell==null) {
+			        		continue;
+			        	}
+		        		switch(cell.getCellType()) {
+		        		case FORMULA:
+		        			cellData = cell.getCellFormula()+"";
+		        			break;
+		        		case NUMERIC:
+		        			cellData = cell.getNumericCellValue()+"";
+		        			break;
+		        		case STRING:
+		        			cellData = cell.getStringCellValue()+"";
+		        			break;
+		        		case BLANK:
+		        			cellData = "";
+		        			break;
+		        		case ERROR:
+		        			cellData = "";
+		        			break;
+		        			default:
+		       
+		        		}
+		        		if(count==0 && num==0) {//첫번째꺼 헤더가져오기
+		        			checkFirstHeader.add(cellData);
+		        		}
+		        		if(count==0 && num==1) {//첫번째꺼 헤더가져오기
+		        			checkSecondHeader.add(cellData);
+		        		}
+		        		if(cell!=null) {
+		        			data.add(cellData);
+		        		}
+		        		
+		        	}
+		        	if(count!=0 && num==0) {//헤더가 동일한지 체크하기
+		        		data.set(0,temp);
+		        		for(int j=0;j<checkFirstHeader.size();j++) {
+		        			if(checkFirstHeader.get(j).equals(data.get(j))==false) {
+		        				//throw new WrongDataForm(key);
+		        			}
+		        		}
+		        		
+		        	}
+		        	else if(count!=0&&num==1) {//헤더가 동일한지 체크하기
+		        		data.set(0,temp);
+		        		for(int j=0;j<checkSecondHeader.size();j++) {
+		        			if(checkSecondHeader.get(j).equals(data.get(j))==false) {
+		        				
+		        				//throw new WrongDataForm(key);
+		        			}
+		        		}
+		        		
+		        	}
+		        	else {
+			        	dataList.addANodeToTail(data);
+		        	}
+			        	num++;
+		        }
+		        temp=key;
+		        count++;
+		    }
+			 }catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			 } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			 }/*catch(WrongDataForm e) {
+				 
+				  e.makeErrorFile();
+			 }*/
+			
+		}
+		return dataList;
+	}
 }
+
+

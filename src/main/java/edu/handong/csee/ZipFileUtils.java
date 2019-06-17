@@ -6,37 +6,65 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
 public class ZipFileUtils {
-	public static HashMap<String,ArrayList<InputStream>> readFileInZip(String path) {
+	private HashMap<String,InputStream> collectTheInputStreamAboutSummary;
+	private HashMap<String,InputStream> collectTheInputStreamAboutImage;
+	public void readFileInZip(String path) {
 		ZipFile zipFile;
-		HashMap<String,ArrayList<InputStream>> collectTheInputStreamAndFileName=new HashMap<String,ArrayList<InputStream>>();
+		String check=null;
+		int count=0;
+		 collectTheInputStreamAboutSummary=new HashMap<String,InputStream>();
+		 collectTheInputStreamAboutImage=new HashMap<String,InputStream>();
 		File dir = new File(path);
 		File[] allTheFileInDirectory= dir.listFiles();
 		try {
 			for(File file: allTheFileInDirectory) {
-			ArrayList<InputStream> collectTheInputStream=new ArrayList<InputStream>();
+			//int number;
+			//ArrayList<InputStream> collectSummary=new ArrayList<InputStream>();
+			//ArrayList<InputStream> collectImage=new ArrayList<InputStream>();
 			zipFile = new ZipFile(file.getAbsoluteFile());
 			int num=file.getName().indexOf(".");
 			String zipFileName=file.getName().substring(0,num);
 			Enumeration<? extends ZipArchiveEntry> entries = zipFile.getEntries();
 		    while(entries.hasMoreElements()){
 		    	ZipArchiveEntry entry = entries.nextElement();
-		        InputStream stream = zipFile.getInputStream(entry);
-		        collectTheInputStream.add(stream);
-		    }
-		    collectTheInputStreamAndFileName.put(zipFileName,collectTheInputStream);
+		    	if(count==0){
+		    		int start=entry.toString().indexOf("(");
+		    		int end=entry.toString().indexOf(")");
+		    		check=entry.toString().substring(start+1, end);
+		    		count++;
+		    	}
+		    	InputStream stream = zipFile.getInputStream(entry);
+		    	if(entry.toString().indexOf(check) != -1) {
+		    		collectTheInputStreamAboutSummary.put(zipFileName,stream);
+		    	}else {
+		    		collectTheInputStreamAboutImage.put(zipFileName,stream);
+		    		//number=1;
+		    	}
+		    	}
+		   /* if(num==1) {
+		    	collectTheInputStreamAboutSummary.put(zipFileName,collectTheInputStream);
+		    }else {
+		    	collectTheInputStreamAboutImage.compute(key, remappingFunction)
+		    }*/
 		    }
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		
-			return collectTheInputStreamAndFileName;
 		
+	}
+	public HashMap<String, InputStream> getCollectTheInputStreamAboutSummary() {
+		return collectTheInputStreamAboutSummary;
+	}
+	public HashMap<String, InputStream> getCollectTheInputStreamAboutImage() {
+		return collectTheInputStreamAboutImage;
 	}
 
 }

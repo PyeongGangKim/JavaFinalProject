@@ -9,10 +9,18 @@ public class JavaFinalProject {
 	private String dataPath;
 	private String resultPath;
 	private boolean help;
-	private LinkedList<ArrayList<String>> dataList;
-	ArrayList<ArrayList<String>> dataCollect;
-	HashMap<String,ArrayList<InputStream>> inputStreamCollector;
- public void run(String[] args) {
+	private LinkedList<ArrayList<String>> summaryList;
+	private LinkedList<ArrayList<String>> imageList;
+	ArrayList<ArrayList<String>> SumaarydataCollect;
+	ArrayList<ArrayList<String>> ImagedataCollect;
+	HashMap<String,InputStream> summary;
+	HashMap<String,InputStream> image;
+	public static void main(String[] args) {
+		JavaFinalProject projector = new JavaFinalProject();
+		projector.run(args);
+	}
+
+	public void run(String[] args) {
 	 Options options = new Options();
 	 createOptions(options);
 	 if(parseOptions(options, args)) {
@@ -20,10 +28,23 @@ public class JavaFinalProject {
 				printHelp(options);
 				return;
 			}
-	 inputStreamCollector=ZipFileUtils.readFileInZip(dataPath);
-	 dataList=Utils.getData(inputStreamCollector);
-	 dataCollect=dataList.toArrayList();
-	 Utils.writeAFile(dataCollect, resultPath);
+	 ZipFileUtils zipFile=new ZipFileUtils();
+	 zipFile.readFileInZip(dataPath);
+	 summary=zipFile.getCollectTheInputStreamAboutSummary();
+	 image=zipFile.getCollectTheInputStreamAboutImage();
+	 summaryList=Utils.getSummaryData(summary);
+	 imageList=Utils.getImageData(image);
+	 SumaarydataCollect=summaryList.toArrayList();
+	 ImagedataCollect=imageList.toArrayList();
+	 
+	 
+	 int num1=resultPath.lastIndexOf(".");
+	 String extension=resultPath.substring(num1);
+	 String result= resultPath.substring(0,num1);
+	 String result1=result+1+extension;
+	 String result2=result+2+extension;
+	 Utils.writeAFile(ImagedataCollect, result1);
+	 Utils.writeAFile(SumaarydataCollect, result2);
 	 }
 }
  private void createOptions(Options options) {
