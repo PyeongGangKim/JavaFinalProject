@@ -11,7 +11,7 @@ import java.util.Iterator;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
-public class ZipFileUtils {
+public class ZipFileUtils { 
 	private HashMap<String,InputStream> collectTheInputStreamAboutSummary;
 	private HashMap<String,InputStream> collectTheInputStreamAboutImage;
 	public void readFileInZip(String path) {

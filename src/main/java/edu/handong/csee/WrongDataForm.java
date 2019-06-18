@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class WrongDataForm extends Exception {
+public class WrongDataForm extends Exception { 
  private String key;
 		public WrongDataForm(){
 			super("Some file have wrong data form.");

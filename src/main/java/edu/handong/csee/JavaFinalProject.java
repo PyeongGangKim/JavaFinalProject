@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.cli.*;
-public class JavaFinalProject extends Thread {
+public class JavaFinalProject extends Thread { 
 	private int selectNumber=0;
 	private String dataPath;
 	private String resultPath;
