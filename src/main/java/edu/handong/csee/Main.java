@@ -7,4 +7,4 @@ public class Main {
 		projector1.start();
 		projector2.start();
 	}
-}
+} 

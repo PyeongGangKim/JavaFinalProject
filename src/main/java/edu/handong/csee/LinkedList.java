@@ -9,7 +9,7 @@ public class LinkedList<D> {
 	public LinkedList() {
 		head = null;
 	}
-
+ 
 	public void showList() {
 		ListNode position = head;
 		while(position != null) {

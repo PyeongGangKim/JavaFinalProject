@@ -34,7 +34,7 @@ public class JavaFinalProject extends Thread {
 	 String result= resultPath.substring(0,num1);
 	 if(selectNumber==1) {
 	 summary=zipFile.getCollectTheInputStreamAboutSummary();
-	 summaryList=Utils.getSummaryData(summary);
+	 summaryList=Utils.getSummaryData(summary); 
 	 SumaarydataCollect=summaryList.toArrayList();
 	 String result2=result+2+extension;
 	 Utils.writeAFile(SumaarydataCollect, result2);

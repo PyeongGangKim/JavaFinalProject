@@ -22,7 +22,7 @@ public class WrongDataForm extends Exception {
 			}catch(IOException e){
 				e.printStackTrace();
 				}
-		}
+		} 
 
 
 }

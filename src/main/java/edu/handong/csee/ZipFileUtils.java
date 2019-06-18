@@ -24,7 +24,7 @@ public class ZipFileUtils {
 		File[] allTheFileInDirectory= dir.listFiles();
 		try {
 			for(File file: allTheFileInDirectory) {
-			zipFile = new ZipFile(file.getAbsoluteFile());
+			zipFile = new ZipFile(file.getAbsoluteFile());  
 			int num=file.getName().indexOf(".");
 			String zipFileName=file.getName().substring(0,num);
 			Enumeration<? extends ZipArchiveEntry> entries = zipFile.getEntries();
