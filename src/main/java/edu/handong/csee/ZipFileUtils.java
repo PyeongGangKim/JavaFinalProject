@@ -24,9 +24,6 @@ public class ZipFileUtils {
 		File[] allTheFileInDirectory= dir.listFiles();
 		try {
 			for(File file: allTheFileInDirectory) {
-			//int number;
-			//ArrayList<InputStream> collectSummary=new ArrayList<InputStream>();
-			//ArrayList<InputStream> collectImage=new ArrayList<InputStream>();
 			zipFile = new ZipFile(file.getAbsoluteFile());
 			int num=file.getName().indexOf(".");
 			String zipFileName=file.getName().substring(0,num);
@@ -44,17 +41,10 @@ public class ZipFileUtils {
 		    		collectTheInputStreamAboutSummary.put(zipFileName,stream);
 		    	}else {
 		    		collectTheInputStreamAboutImage.put(zipFileName,stream);
-		    		//number=1;
 		    	}
 		    	}
-		   /* if(num==1) {
-		    	collectTheInputStreamAboutSummary.put(zipFileName,collectTheInputStream);
-		    }else {
-		    	collectTheInputStreamAboutImage.compute(key, remappingFunction)
-		    }*/
 		    }
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		

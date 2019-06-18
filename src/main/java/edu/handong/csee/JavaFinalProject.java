@@ -17,13 +17,7 @@ public class JavaFinalProject extends Thread {
 	ArrayList<ArrayList<String>> ImagedataCollect;
 	HashMap<String,InputStream> summary;
 	HashMap<String,InputStream> image;
-	public static void main(String[] args) {
-		JavaFinalProject projector1 = new JavaFinalProject(1,args);
-		JavaFinalProject projector2 = new JavaFinalProject(2,args);
-		projector1.start();
-		projector2.start();
-	}
-
+	
 	public void run() {
 	 Options options = new Options();
 	 createOptions(options);
@@ -71,9 +65,7 @@ public class JavaFinalProject extends Thread {
 	
 		options.addOption(Option.builder("h").longOpt("help")
 				.desc("Show a Help page")
-				//.hasArg()
 				.argName("Help")
-				//.required()
 				.build());
 	}
  public JavaFinalProject(int num,String[] arg) {

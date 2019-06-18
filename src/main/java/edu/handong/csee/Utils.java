@@ -40,8 +40,8 @@ public class Utils {
 		}
 		
 	
-		HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet();
+		Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
         int rowNum = 0;
         for(ArrayList<String> line: lines) {
         	Row row = sheet.createRow(rowNum++);
@@ -60,11 +60,7 @@ public class Utils {
 	}
 
 
-	/*public void run() {
-		
-		
-	}*/
-
+	
 	
 	public static LinkedList<ArrayList<String>> getSummaryData(HashMap<String,InputStream> zipFiles)  {
 		int count=0;
@@ -75,24 +71,25 @@ public class Utils {
 		while(iteratorKey.hasNext()) {
 			int num=0;
 			String key = iteratorKey.next();
-			String temp = null;
 			InputStream is=zipFiles.get(key);
 		try {
 		    if(is!=null) {
+		    	if(count==0) {
+		    		checkHead.add(key);
+		    	}
 		    	Workbook wb = WorkbookFactory.create(is);
 		    	Sheet sheet = wb.getSheetAt(0);
-		        int rows = sheet.getPhysicalNumberOfRows();
+		    	int rows = sheet.getPhysicalNumberOfRows();
 		        for(int r=0;r<rows;r++) {//row를 하나씩
-		        	ArrayList<String> data= new ArrayList<String>();
+		        	boolean dataCheck=false;
+		           	ArrayList<String> data= new ArrayList<String>();
 		        	data.add(key);
 		        	Row row=sheet.getRow(r);
-		        	int cells=row.getPhysicalNumberOfCells();
-		        	for(int c=0;c<cells;c++) {//한 행씩 저장하기
+		        
+		
+		           	for(int c=0;c<7;c++) {//한 행씩 저장하기
 		        		Cell cell = row.getCell(c,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 		        		String cellData= new String();
-		        	if(cell==null) {
-		        		continue;
-		        	}
 		        		switch(cell.getCellType()) {
 		        		case FORMULA:
 		        			cellData = cell.getCellFormula();
@@ -103,37 +100,51 @@ public class Utils {
 		        		case STRING:
 		        			cellData = cell.getStringCellValue()+"";
 		        			break;
-		        		/*case BLANK:
+		        		case BLANK:
 		        			cellData =" ";
 		        			break;
-		        		/*case ERROR:
+		        		case ERROR:
 		        			cellData = " ";
-		        			break;*/
+		        			break;
 		        			default:
 		       
 		        		}
+		       
+		        		
 		        		if(count==0&&num==0) {//첫번째꺼 헤더가져오기
 		        			checkHead.add(cellData);
 		        		}
-		        		if(cell!=null) {
 		        			data.add(cellData);
-		        		}
+		        		
 		        		
 		        	}
+		        	
 		        	if(count!=0&&num==0) {//헤더가 동일한지 체크하기
-		        		data.set(0,temp);
-		        		for(int j=0;j<checkHead.size();j++) {
-		        			if(checkHead.get(j).equals(data.get(j))==false) {
-		        				//throw new WrongDataForm(key);
+		        		for(int j=1;j<data.size();j++) {
+		        			String check1=checkHead.get(j);
+		        			String check2=data.get(j);
+		        			if(!(check1.equals(check2))) {
+		        				throw new WrongDataForm(key);
 		        			}
 		        		}
 		        		
 		        	}else {
+		        		if(count==0&&num==0) {
+		        			data.set(0,"id");
+		        		}
+		        		for(int i=1;i<data.size();i++) {
+			        		String space=" ";
+			        		if(!(data.get(i).equals(space))) {
+			        			dataCheck=true;
+			        		}
+			        		
+			        		}
+			        		if(dataCheck) {
 		        	dataList.addANodeToTail(data);
+			        		}
 		        	}	
 		        	num++;
 		        }
-		        temp=key;
 		        count++;
 		    }
 			 }catch (FileNotFoundException e) {
@@ -142,10 +153,10 @@ public class Utils {
 			 } catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			 }/*catch (WrongDataForm e) {
+			 }catch (WrongDataForm e) {
 				 e.makeErrorFile();
 				 
-			 }*/
+			 }
 			
 		}
 		return dataList;
@@ -160,25 +171,24 @@ public class Utils {
 		while(iteratorKey.hasNext()) {
 			int num=0;//헤더세기
 			String key = iteratorKey.next();
-			String temp = null;
 			InputStream is=zipFiles.get(key);
 		try {
 		    if(is!=null) {
+		    	if(count==0) {
+		    		checkFirstHeader.add(key);
+		    		checkSecondHeader.add(key);
+		    	}
 		    	Workbook wb = WorkbookFactory.create(is);
 		    	Sheet sheet = wb.getSheetAt(0);
 		        int rows = sheet.getPhysicalNumberOfRows();
 		        for(int r=0;r<rows;r++) {//row를 하나씩
-		        	
+		        	boolean dataCheck=false;
 		        	ArrayList<String> data= new ArrayList<String>();
 		        	data.add(key);
 		        	Row row=sheet.getRow(r);
-		        	int cells=row.getPhysicalNumberOfCells();
-		        	for(int c=0;c<cells;c++) {//한 행씩 저장하기
+		        	for(int c=0;c<5;c++) {//한 행씩 저장하기
 		        		Cell cell = row.getCell(c,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 		        		String cellData= new String();
-		        		if(cell==null) {
-			        		continue;
-			        	}
 		        		switch(cell.getCellType()) {
 		        		case FORMULA:
 		        			cellData = cell.getCellFormula()+"";
@@ -198,6 +208,7 @@ public class Utils {
 		        			default:
 		       
 		        		}
+		        		
 		        		if(count==0 && num==0) {//첫번째꺼 헤더가져오기
 		        			checkFirstHeader.add(cellData);
 		        		}
@@ -210,30 +221,49 @@ public class Utils {
 		        		
 		        	}
 		        	if(count!=0 && num==0) {//헤더가 동일한지 체크하기
-		        		data.set(0,temp);
-		        		for(int j=0;j<checkFirstHeader.size();j++) {
-		        			if(checkFirstHeader.get(j).equals(data.get(j))==false) {
-		        				//throw new WrongDataForm(key);
+		        		for(int j=1;j<data.size();j++) {
+		        			String check1=checkFirstHeader.get(j);
+		        			String check2=data.get(j);
+		        			if(!(check1.equals(check2))) {
+		        				throw new WrongDataForm(key);
 		        			}
 		        		}
 		        		
 		        	}
 		        	else if(count!=0&&num==1) {//헤더가 동일한지 체크하기
-		        		data.set(0,temp);
-		        		for(int j=0;j<checkSecondHeader.size();j++) {
-		        			if(checkSecondHeader.get(j).equals(data.get(j))==false) {
+		        		for(int j=1;j<data.size();j++) {
+		        			String check1=checkSecondHeader.get(j);
+		        			String check2=data.get(j);
+		        			if(!(check1.equals(check2))) {
 		        				
-		        				//throw new WrongDataForm(key);
+		        				throw new WrongDataForm(key);
 		        			}
 		        		}
 		        		
 		        	}
 		        	else {
+		        		if(count==0&&num==1) {
+		        			data.set(0,"id");
+		        		}
+		        		if(count==0&&num==0) {
+		        			data.remove(0);
+		        			dataList.addANodeToTail(data);
+		        		}
+		        		for(int i=1;i<data.size();i++) {
+		        		String space="";
+		        		if(!(data.get(i).equals(space))) {
+		        	
+		        			dataCheck=true;
+		        		}
+		        		
+		        		}
+		        		if(dataCheck) {
 			        	dataList.addANodeToTail(data);
+		        		}
+		       
 		        	}
 			        	num++;
 		        }
-		        temp=key;
 		        count++;
 		    }
 			 }catch (FileNotFoundException e) {
@@ -242,10 +272,10 @@ public class Utils {
 			 } catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			 }/*catch(WrongDataForm e) {
+			 }catch(WrongDataForm e) {
 				 
 				  e.makeErrorFile();
-			 }*/
+			 }
 			
 		}
 		return dataList;

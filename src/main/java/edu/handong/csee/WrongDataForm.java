@@ -17,7 +17,7 @@ public class WrongDataForm extends Exception {
 			File error =new File("error.csv");
 			try {
 				FileWriter fw = new FileWriter(error, true);
-	            fw.write(key);
+	            fw.write(key+".zip"+"\n");
 	            fw.close();
 			}catch(IOException e){
 				e.printStackTrace();
